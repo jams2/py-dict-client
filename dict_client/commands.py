@@ -3,6 +3,8 @@ from abc import (
     abstractmethod,
 )
 
+from constants import BUF_SIZE
+from response import DictServerResponse
 from status_codes import DictStatusCode
 
 

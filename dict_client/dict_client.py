@@ -2,17 +2,20 @@ import socket
 import getpass
 from datetime import datetime
 
-from parsers import HandshakeResponseParser
-from status_codes import DictStatusCode
-from constants import (
-    BUF_SIZE,
-    DEFAULT_PORT,
-)
 from commands import (
     ClientIdentCommand,
     DefineWordCommand,
     DisconnectCommand,
 )
+from constants import (
+    BUF_SIZE,
+    DEFAULT_PORT,
+)
+from response import (
+    DictServerResponse,
+    HandshakeResponseParser,
+)
+from status_codes import DictStatusCode
 
 
 class DictClient:
