@@ -31,6 +31,7 @@ class HandshakeResponseParser:
                 f'{self.response_text}'
             )
         self.parsed_content = {
-            'capabilities': '.'.split(match.group('capabilities')),
-            'message_id': match.group('capabilities'),
+            'capabilities': match.group('capabilities').split('.'),
+            'message_id': match.group('msg_id'),
         }
+        return self.parsed_content
