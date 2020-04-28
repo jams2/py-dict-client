@@ -17,16 +17,28 @@ class DictClient:
     def __init__(self, host='localhost', port=DEFAULT_PORT, sock_class=socket.socket):
         self.client_name = f'{getpass.getuser()}@{socket.gethostname()}'
         self.client_id_info = f'{self.client_name} {datetime.now().isoformat()}'
-        self.sock_class = sock_class
-        self.sock = self.setup_socket(host, port)
+        self.sock, self.server_info = self.setup_socket(sock_class, host, port)
 
-    def setup_socket(self, host, port):
-        sock = self.sock_class(socket.AF_INET, socket.SOCK_STREAM)
+    def setup_socket(self, sock_class, host, port):
+        sock = sock_class(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((host, port))
-        response = DictServerResponse(sock.recv(BUF_SIZE))
-        if response.get_status() != DictStatusCode.CONNECTION_ACCEPTED:
-            raise Exception(response.get_status())
-        return sock
+        connection_response = DictServerResponse(
+            sock.recv(BUF_SIZE),
+            handler_class=ConnectionResponseParser,
+        )
+        if connection_response.get_status() != DictStatusCode.CONNECTION_ACCEPTED:
+            raise Exception(connection_response.get_status())
+        self._send_client_ident(sock)
+        return (sock, connection_response.content)
+
+    def _send_client_ident(self, sock):
+        request = ClientIdentRequest(sock, self.client_id_info)
+        request.send()
+        if request.get_status() != DictStatusCode.OK:
+            raise Exception(request.get_status())
+
+    def parse_server_info(self):
+        pass
 
     def get_word_definitions(self, word, database_name='*'):
         response = DefineWordRequest(self.sock, word, database_name=database_name)
@@ -43,14 +55,16 @@ class DictClientRequest(metaclass=ABCMeta):
     def __init__(self, sock):
         self.sock = sock
         self.response_segments = []
-        self._send()
 
     @abstractmethod
     def get_query(self, *args, **kwargs):
         pass
 
-    def _encode_string(self, string, encoding='utf-8'):
-        return string.encode(encoding)
+    def send(self):
+        self._send()
+
+    def _encode_query(self, query, encoding='utf-8'):
+        return f'{query}\r\n'.encode(encoding)
 
     def get_status(self):
         return self.response_segments[0].get_status()
@@ -59,7 +73,7 @@ class DictClientRequest(metaclass=ABCMeta):
         return self.response_segments[-1].get_status()
 
     def _send(self, *args, **kwargs):
-        self.sock.send(self.get_query())
+        self.sock.sendall(self.get_query())
         self._recv()
         if DictStatusCode.TEXT_FOLLOWS(self._last_response_status()):
             while not DictStatusCode.RESPONSE_COMPLETE(self._last_response_status()):
@@ -69,9 +83,18 @@ class DictClientRequest(metaclass=ABCMeta):
         self.response_segments.append(DictServerResponse(self.sock.recv(BUF_SIZE)))
 
 
+class ClientIdentRequest(DictClientRequest):
+    def __init__(self, sock, client_id_info):
+        self.client_id_info = client_id_info
+        super().__init__(sock)
+
+    def get_query(self):
+        return self._encode_query(f'CLIENT {self.client_id_info}')
+
+
 class DisconnectRequest(DictClientRequest):
     def get_query(self):
-        return self._encode_string('QUIT\r\n')
+        return self._encode_query('QUIT')
 
 
 class DefineWordRequest(DictClientRequest):
@@ -81,17 +104,42 @@ class DefineWordRequest(DictClientRequest):
         super().__init__(sock)
 
     def get_query(self):
-        return self._encode_string(f'DEFINE {self.database_name} {self.word}\r\n')
+        return self._encode_query(f'DEFINE {self.database_name} {self.word}')
 
 
 class DictServerResponse:
-    SEGMENT_START = re.compile(r'^\d{3}')
-
-    def __init__(self, response_bytes):
+    def __init__(self, response_bytes, handler_class=None):
         self.response = response_bytes.decode('utf-8')
+        if handler_class:
+            response_handler = handler_class(self.response)
+            self.content = response_handler.get_content()
 
     def get_status(self):
         return int(self.response[:3])
+
+
+class ConnectionResponseParser:
+    REGEXP = re.compile(
+        r'<(?P<capabilities>[\w\d_]*(\.[\w\d_]+)*)>\s*(?P<msg_id><[\d\w@.]+>)'
+    )
+
+    def __init__(self, response_text):
+        self.response_text = response_text
+        self.parsed_content = None
+
+    def get_content(self):
+        if self.parsed_content is not None:
+            return self.parsed_content
+        match = self.REGEXP.search(self.response_text)
+        if not match:
+            raise ValueError(
+                'Client got unexpected banner in connection response: '
+                f'{self.response_text}'
+            )
+        self.parsed_content = {
+            'capabilities': '.'.split(match.group('capabilities')),
+            'message_id': match.group('capabilities'),
+        }
 
 
 class DictStatusCode(IntEnum):
