@@ -32,26 +32,26 @@ class DictClient:
         return (sock, connection_response.content)
 
     def _send_client_ident(self, sock):
-        request = ClientIdentRequest(sock, self.client_id_info)
-        request.send()
-        if request.get_status() != DictStatusCode.OK:
-            raise Exception(request.get_status())
+        command = ClientIdentCommand(sock, self.client_id_info)
+        command.send()
+        if command.get_status() != DictStatusCode.OK:
+            raise Exception(command.get_status())
 
     def parse_server_info(self):
         pass
 
     def get_word_definitions(self, word, database_name='*'):
-        response = DefineWordRequest(self.sock, word, database_name=database_name)
-        return response
+        command = DefineWordCommand(self.sock, word, database_name=database_name)
+        return command
 
     def disconnect(self):
-        response = DisconnectRequest(self.sock)
-        if response.get_status() != DictStatusCode.CLOSING_CONNECTION:
-            raise Exception(response.get_status())
+        command = DisconnectCommand(self.sock)
+        if command.get_status() != DictStatusCode.CLOSING_CONNECTION:
+            raise Exception(command.get_status())
         self.sock.close()
 
 
-class DictClientRequest(metaclass=ABCMeta):
+class DictClientCommand(metaclass=ABCMeta):
     def __init__(self, sock):
         self.sock = sock
         self.response_segments = []
@@ -83,7 +83,7 @@ class DictClientRequest(metaclass=ABCMeta):
         self.response_segments.append(DictServerResponse(self.sock.recv(BUF_SIZE)))
 
 
-class ClientIdentRequest(DictClientRequest):
+class ClientIdentCommand(DictClientCommand):
     def __init__(self, sock, client_id_info):
         self.client_id_info = client_id_info
         super().__init__(sock)
@@ -92,12 +92,12 @@ class ClientIdentRequest(DictClientRequest):
         return self._encode_query(f'CLIENT {self.client_id_info}')
 
 
-class DisconnectRequest(DictClientRequest):
+class DisconnectCommand(DictClientCommand):
     def get_query(self):
         return self._encode_query('QUIT')
 
 
-class DefineWordRequest(DictClientRequest):
+class DefineWordCommand(DictClientCommand):
     def __init__(self, sock, word, database_name='*'):
         self.word = word
         self.database_name = database_name
