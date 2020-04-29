@@ -1,12 +1,12 @@
 import unittest
 
 from socket_stub import SocketStub
-from dict_client import DictClient
+from dictionary_client import DictionaryClient
 
 
 class TestDictClient(unittest.TestCase):
     def test_parses_server_banner(self):
-        client = DictClient(sock_class=SocketStub)
+        client = DictionaryClient(sock_class=SocketStub)
         self.assertEqual(
             {
                 'capabilities': ['auth', 'mime'],

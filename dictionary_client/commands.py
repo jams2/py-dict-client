@@ -4,30 +4,32 @@ from abc import (
 )
 
 from constants import BUF_SIZE
-from response import DictServerResponse
 from status_codes import DictStatusCode
 
 
-class DictClientCommand(metaclass=ABCMeta):
+class DictionaryClientCommand(metaclass=ABCMeta):
     def __init__(self, sock):
         self.sock = sock
-        self.response_segments = []
+        self._response_segments = []
+        self.response = None
 
     @abstractmethod
     def get_query(self, *args, **kwargs):
         pass
 
+    @abstractmethod
+    def get_response_class(self):
+        pass
+
     def send(self):
         self._send()
+        return self.response
 
     def _encode_query(self, query, encoding='utf-8'):
         return f'{query}\r\n'.encode(encoding)
 
-    def get_status(self):
-        return self.response_segments[0].get_status()
-
     def _last_response_status(self):
-        return self.response_segments[-1].get_status()
+        return int(self._response_segments[-1][0:3])
 
     def _send(self, *args, **kwargs):
         self.sock.sendall(self.get_query())
@@ -37,24 +39,27 @@ class DictClientCommand(metaclass=ABCMeta):
                 self._recv()
 
     def _recv(self):
-        self.response_segments.append(DictServerResponse(self.sock.recv(BUF_SIZE)))
+        self._response_segments.append(self.sock.recv(BUF_SIZE))
 
 
-class ClientIdentCommand(DictClientCommand):
+class ClientIdentCommand(DictionaryClientCommand):
     def __init__(self, sock, client_id_info):
         self.client_id_info = client_id_info
         super().__init__(sock)
+
+    def get_response_class(self):
+        pass
 
     def get_query(self):
         return self._encode_query(f'CLIENT {self.client_id_info}')
 
 
-class DisconnectCommand(DictClientCommand):
+class DisconnectCommand(DictionaryClientCommand):
     def get_query(self):
         return self._encode_query('QUIT')
 
 
-class DefineWordCommand(DictClientCommand):
+class DefineWordCommand(DictionaryClientCommand):
     def __init__(self, sock, word, database_name='*'):
         self.word = word
         self.database_name = database_name
