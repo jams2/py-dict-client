@@ -30,14 +30,14 @@ class DictClient:
     def setup_socket(self, sock_class, host, port):
         sock = sock_class(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((host, port))
-        connection_response = DictServerResponse(
+        handshake_response = DictServerResponse(
             sock.recv(BUF_SIZE),
             handler_class=HandshakeResponseParser,
         )
-        if connection_response.get_status() != DictStatusCode.CONNECTION_ACCEPTED:
-            raise Exception(connection_response.get_status())
+        if handshake_response.get_status() != DictStatusCode.CONNECTION_ACCEPTED:
+            raise Exception(handshake_response.get_status())
         self._send_client_ident(sock)
-        return (sock, connection_response.content)
+        return (sock, handshake_response.content)
 
     def _send_client_ident(self, sock):
         command = ClientIdentCommand(sock, self.client_id_info)
