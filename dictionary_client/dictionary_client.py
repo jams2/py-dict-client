@@ -10,7 +10,6 @@ from commands import (
     show_strategies_command,
     show_databases_command,
 )
-from constants import BUF_SIZE
 from response import (
     HandshakeResponse,
     DefineWordResponse,
@@ -20,12 +19,16 @@ from response import (
 from status_codes import DictStatusCode
 
 
+BUF_SIZE = 4096
+DEFAULT_PORT = 2628
+
+
 class DictionaryClient:
     """Implements a client for communication with a server implementing
     the DICT Server Protocol (https://tools.ietf.org/html/rfc2229).
     """
 
-    def __init__(self, host="localhost", port=2628, sock_class=socket.socket):
+    def __init__(self, host="localhost", port=DEFAULT_PORT, sock_class=socket.socket):
         self.client_name = f"{getpass.getuser()}@{socket.gethostname()}"
         self.client_id_info = f"{self.client_name} {datetime.now().isoformat()}"
         self.sock = sock_class(socket.AF_INET, socket.SOCK_STREAM)
