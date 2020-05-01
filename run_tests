@@ -1,0 +1,3 @@
+#!/bin/sh
+
+nose2 -s dictionary_client/ -C --coverage-config .coveragerc && coverage html

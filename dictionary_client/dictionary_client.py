@@ -8,6 +8,7 @@ from commands import (
     define_word_command,
     disconnect_command,
     show_strategies_command,
+    show_databases_command,
 )
 from constants import (
     BUF_SIZE,
@@ -16,7 +17,7 @@ from response import (
     HandshakeResponse,
     DefineWordResponse,
     PreliminaryResponse,
-    StrategiesResponse,
+    ServerPropertiesResponse,
 )
 from status_codes import DictStatusCode
 
@@ -31,6 +32,7 @@ class DictionaryClient:
         self.sock = sock_class(socket.AF_INET, socket.SOCK_STREAM)
         self.server_info = self._connect(host, port)
         self.strategies = self._get_strategies()
+        self.databases = self._get_databases()
 
     def _recv_all(self):
         rlist, _, _ = select.select([self.sock], [], [], 5)
@@ -72,13 +74,22 @@ class DictionaryClient:
 
     def _get_strategies(self):
         self.sock.sendall(show_strategies_command())
-        response = StrategiesResponse(self._recv_all())
+        response = ServerPropertiesResponse(self._recv_all())
         return response.content
 
-    def define_word(self, word, db='*'):
+    def _get_databases(self):
+        self.sock.sendall(show_databases_command())
+        response = ServerPropertiesResponse(self._recv_all())
+        return response.content
+
+    def define(self, word, db='*'):
         self.sock.sendall(define_word_command(word, db))
         response = DefineWordResponse(self._recv_all())
         return response.content
+
+    def match(self, word, strategy, db='*'):
+        if self.strategies is None:
+            raise NotSupported
 
     def disconnect(self):
         self.sock.sendall(disconnect_command())
@@ -89,3 +100,11 @@ class DictionaryClient:
                 f'"{bytes_recieved.decode()}"'
             )
         self.sock.close()
+
+
+class DictionaryClientException(Exception):
+    pass
+
+
+class NotSupported(DictionaryClientException):
+    pass

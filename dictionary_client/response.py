@@ -23,12 +23,17 @@ class BaseResponse(metaclass=ABCMeta):
         pass
 
 
-class StrategiesResponse(BaseResponse):
+class ServerPropertiesResponse(BaseResponse):
+    """ Responses to a SHOW DB or SHOW STRAT command
+    """
     def parse_content(self):
+        if self.status_code > 500:
+            return None
         response_lines = self.response_text.split('\r\n')
         content_lines = list(filter(lambda x: not x[:3].isnumeric(), response_lines))
         content_lines = content_lines[:content_lines.index('.')]
-        return set(line.split()[0] for line in content_lines)
+        lines_split = (line.split(maxsplit=1) for line in content_lines)
+        return {l[0]: l[1].strip('"') for l in lines_split}
 
 
 class PreliminaryResponse(BaseResponse):
@@ -73,18 +78,18 @@ class DefineWordResponse(BaseResponse):
 
 
 class HandshakeResponse(PreliminaryResponse):
-    CONTENT_REGEXP = re.compile(
-        r'<(?P<capabilities>[\w\d_]*(\.[\w\d_]+)*)>\s*(?P<msg_id><[\d\w@.]+>)'
-    )
+    CAPABILITIES_RE = re.compile(r'<([\w\d_]*(\.[\w\d_]+)*)>')
+    MSG_ID_RE = re.compile(r'(<[\d\w@.]+>)\r\n')
 
     def parse_content(self):
-        match = self.CONTENT_REGEXP.search(self.response_text)
-        if not match:
+        capabilities_match = self.CAPABILITIES_RE.search(self.response_text)
+        msg_id_match = self.MSG_ID_RE.search(self.response_text)
+        if not msg_id_match:
             raise ValueError(
                 'Client got unexpected banner in connection response: '
                 f'{self.response_text}'
             )
-        return {
-            'capabilities': match.group('capabilities').split('.'),
-            'message_id': match.group('msg_id'),
-        }
+        content = {'message_id': msg_id_match.group(1), 'capabilities': None}
+        if capabilities_match:
+            content.update({'capabilities': capabilities_match.group(1).split('.')})
+        return content
