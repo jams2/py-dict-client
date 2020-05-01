@@ -10,9 +10,7 @@ from commands import (
     show_strategies_command,
     show_databases_command,
 )
-from constants import (
-    BUF_SIZE,
-)
+from constants import BUF_SIZE
 from response import (
     HandshakeResponse,
     DefineWordResponse,
@@ -26,9 +24,10 @@ class DictionaryClient:
     """Implements a client for communication with a server implementing
     the DICT Server Protocol (https://tools.ietf.org/html/rfc2229).
     """
-    def __init__(self, host='localhost', port=2628, sock_class=socket.socket):
-        self.client_name = f'{getpass.getuser()}@{socket.gethostname()}'
-        self.client_id_info = f'{self.client_name} {datetime.now().isoformat()}'
+
+    def __init__(self, host="localhost", port=2628, sock_class=socket.socket):
+        self.client_name = f"{getpass.getuser()}@{socket.gethostname()}"
+        self.client_id_info = f"{self.client_name} {datetime.now().isoformat()}"
         self.sock = sock_class(socket.AF_INET, socket.SOCK_STREAM)
         self.server_info = self._connect(host, port)
         self.strategies = self._get_strategies()
@@ -37,7 +36,7 @@ class DictionaryClient:
     def _recv_all(self):
         rlist, _, _ = select.select([self.sock], [], [], 5)
         if self.sock not in rlist:
-            raise TimeoutError('Client timed out expecting server response.')
+            raise TimeoutError("Client timed out expecting server response.")
         bytes_received = self.sock.recv(BUF_SIZE)
         status_code = self._get_status(bytes_received)
         if DictStatusCode.response_complete(status_code):
@@ -46,8 +45,8 @@ class DictionaryClient:
             rlist, _, _ = select.select([self.sock], [], [], 5)
             if self.sock not in rlist:
                 raise TimeoutError(
-                    'Client timed out following preliminary response with status '
-                    f'{status_code}.'
+                    "Client timed out following preliminary response with status "
+                    f"{status_code}."
                 )
             bytes_received += self.sock.recv(BUF_SIZE)
         return bytes_received
@@ -70,7 +69,7 @@ class DictionaryClient:
         return int(response_bytes[:3])
 
     def _response_complete(self, response_bytes):
-        return b'250' in response_bytes
+        return b"250" in response_bytes
 
     def _get_strategies(self):
         self.sock.sendall(show_strategies_command())
@@ -82,12 +81,12 @@ class DictionaryClient:
         response = ServerPropertiesResponse(self._recv_all())
         return response.content
 
-    def define(self, word, db='*'):
+    def define(self, word, db="*"):
         self.sock.sendall(define_word_command(word, db))
         response = DefineWordResponse(self._recv_all())
         return response.content
 
-    def match(self, word, strategy, db='*'):
+    def match(self, word, strategy, db="*"):
         if self.strategies is None:
             raise NotSupported
 
@@ -96,7 +95,7 @@ class DictionaryClient:
         bytes_recieved = self._recv_all()
         if self._get_status(bytes_recieved) != DictStatusCode.CLOSING_CONNECTION:
             raise ConnectionError(
-                'Client got unexpected response to QUIT command: '
+                "Client got unexpected response to QUIT command: "
                 f'"{bytes_recieved.decode()}"'
             )
         self.sock.close()
