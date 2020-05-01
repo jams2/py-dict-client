@@ -3,11 +3,11 @@ from enum import IntEnum
 
 class DictStatusCode(IntEnum):
     @staticmethod
-    def RESPONSE_COMPLETE(status):
+    def response_complete(status):
         return status >= 200 and status < 300
 
     @staticmethod
-    def TEXT_FOLLOWS(status):
+    def text_follows(status):
         return status >= 100 and status < 200
 
     DATABASES_PRESENT = 110
