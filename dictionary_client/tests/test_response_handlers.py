@@ -5,6 +5,7 @@ from response import (
     ServerPropertiesResponse,
     HandshakeResponse,
     DefineWordResponse,
+    MatchResponse,
 )
 
 
@@ -105,6 +106,12 @@ class TestShowDatabaseResponse(unittest.TestCase):
 
 
 class TestDefineWordResponse(unittest.TestCase):
+    def test_no_match(self):
+        dict_response = b"552 No match\r\n"
+        response = DefineWordResponse(dict_response)
+        self.assertIsNone(response.content)
+        self.assertEqual(552, response.status_code)
+
     def test_word_definition_single_db(self):
         dict_response = (
             b"150 1 definition retrieved\r\n"
@@ -179,3 +186,69 @@ class TestDefineWordResponse(unittest.TestCase):
             ],
             response.content,
         )
+
+
+class TestMatchResponse(unittest.TestCase):
+    def test_parse_content_one_db(self):
+        dict_response = (
+            b"152 7 matches found: list follows\r\n"
+            b"foldoc Fast SCSI\r\n"
+            b"foldoc SCSI\r\n"
+            b"foldoc SCSI-1\r\n"
+            b"foldoc SCSI-2\r\n"
+            b"foldoc SCSI-3\r\n"
+            b"foldoc Ultra-SCSI\r\n"
+            b"foldoc Wide SCSI\r\n"
+            b".\r\n"
+            b"250 Command complete\r\n"
+        )
+        response = MatchResponse(dict_response)
+        self.assertEqual(
+            {
+                "foldoc": [
+                    "Fast SCSI",
+                    "SCSI",
+                    "SCSI-1",
+                    "SCSI-2",
+                    "SCSI-3",
+                    "Ultra-SCSI",
+                    "Wide SCSI",
+                ]
+            },
+            response.content,
+        )
+        self.assertEqual(152, response.status_code)
+
+    def test_parse_content_with_quote_marks(self):
+        """ The spec shows no quote marks around matches, but on this
+        user's machine (dictd on Arch Linux) the following is returned.
+        Handle both cases.
+        """
+        dict_response = (
+            b"152 5 matches found: list follows\r\n"
+            b'wn "william sydney porter"\r\n'
+            b'wn "written report"\r\n'
+            b'foldoc "accelerated graphics port"\r\n'
+            b'foldoc "ada programming support environment"\r\n'
+            b'foldoc "application portability architecture"\r\n'
+            b".\r\n"
+            b"250 Command complete\r\n"
+        )
+        response = MatchResponse(dict_response)
+        self.assertEqual(
+            {
+                "wn": ["william sydney porter", "written report"],
+                "foldoc": [
+                    "accelerated graphics port",
+                    "ada programming support environment",
+                    "application portability architecture",
+                ],
+            },
+            response.content,
+        )
+
+    def test_no_match(self):
+        dict_response = b"552 No match\r\n"
+        response = MatchResponse(dict_response)
+        self.assertIsNone(response.content)
+        self.assertEqual(552, response.status_code)

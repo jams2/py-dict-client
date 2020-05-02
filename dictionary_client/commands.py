@@ -20,3 +20,7 @@ def disconnect_command():
 
 def define_word_command(word, db="*"):
     return encode_query(f"DEFINE {db} {word}")
+
+
+def match_command(word, db="*", strategy="exact"):
+    return encode_query(f"MATCH {db} {strategy} {word}")

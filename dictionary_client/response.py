@@ -1,5 +1,8 @@
 import re
 from abc import ABCMeta, abstractmethod
+from collections import defaultdict
+
+from status_codes import DictStatusCode
 
 
 class BaseResponse(metaclass=ABCMeta):
@@ -21,6 +24,9 @@ class BaseResponse(metaclass=ABCMeta):
     @abstractmethod
     def parse_content(self):
         pass
+
+    def is_content_line(self, line):
+        return self.STATUS_REGEXP.match(line) is None
 
 
 class ServerPropertiesResponse(BaseResponse):
@@ -57,13 +63,12 @@ class DefineWordResponse(BaseResponse):
     DEFINITION_DELIMITER = "."
 
     def parse_content(self):
-        definitions = []
-        lines = self.response_text.split("\r\n")
+        if self.status_code == DictStatusCode.NO_MATCH:
+            return None
         definition_lines = list(
-            filter(
-                lambda x: not x.startswith("150") and not x.startswith("250"), lines,
-            )
+            filter(self.is_content_line, self.response_text.split("\r\n"))
         )
+        definitions = []
         while "." in definition_lines:
             delim_index = definition_lines.index(self.DEFINITION_DELIMITER)
             new_def = definition_lines[:delim_index]
@@ -73,8 +78,23 @@ class DefineWordResponse(BaseResponse):
             definition_lines = definition_lines[delim_index + 1 :]
         return definitions
 
-    def parse_status_code(self):
-        pass
+    def is_content_line(self, line):
+        return not line.startswith("150") and not line.startswith("250")
+
+
+class MatchResponse(BaseResponse):
+    def parse_content(self):
+        if self.status_code == DictStatusCode.NO_MATCH:
+            return None
+        match_lines = list(
+            filter(self.is_content_line, self.response_text.split("\r\n"))
+        )
+        match_lines = match_lines[: match_lines.index(".")]
+        matches = defaultdict(list)
+        for line in match_lines:
+            db_name, match = line.split(maxsplit=1)
+            matches[db_name].append(match.strip('"'))
+        return matches
 
 
 class HandshakeResponse(PreliminaryResponse):

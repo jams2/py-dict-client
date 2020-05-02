@@ -9,6 +9,7 @@ from commands import (
     disconnect_command,
     show_strategies_command,
     show_databases_command,
+    match_command,
 )
 from response import (
     HandshakeResponse,
@@ -89,9 +90,8 @@ class DictionaryClient:
         response = DefineWordResponse(self._recv_all())
         return response.content
 
-    def match(self, word, strategy, db="*"):
-        if self.strategies is None:
-            raise NotSupported
+    def match(self, word, db="*", strategy="exact"):
+        self.sock.sendall(match_command(word, db=db, strategy=strategy))
 
     def disconnect(self):
         self.sock.sendall(disconnect_command())
