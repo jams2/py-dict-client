@@ -16,6 +16,7 @@ from response import (
     DefineWordResponse,
     PreliminaryResponse,
     ServerPropertiesResponse,
+    MatchResponse,
 )
 from status_codes import DictStatusCode
 
@@ -92,6 +93,8 @@ class DictionaryClient:
 
     def match(self, word, db="*", strategy="exact"):
         self.sock.sendall(match_command(word, db=db, strategy=strategy))
+        response = MatchResponse(self._recv_all())
+        return response.content
 
     def disconnect(self):
         self.sock.sendall(disconnect_command())
