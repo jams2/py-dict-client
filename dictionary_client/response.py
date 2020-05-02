@@ -2,11 +2,13 @@ import re
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
-from status_codes import DictStatusCode
+from status_codes import DictStatusCode, PERMANENT_NEGATIVE_COMPLETION_CODES
 
 
 class BaseResponse(metaclass=ABCMeta):
     STATUS_REGEXP = re.compile(r"^\d{3}")
+    CONTENT_DELIMITER = "."
+    LINE_DELIMITER = "\r\n"
 
     def __init__(self, response_bytes):
         self.response_text = response_bytes.decode()
@@ -34,13 +36,13 @@ class ServerPropertiesResponse(BaseResponse):
     """
 
     def parse_content(self):
-        if self.status_code > 500:
+        if self.status_code in PERMANENT_NEGATIVE_COMPLETION_CODES:
             return None
-        response_lines = self.response_text.split("\r\n")
-        content_lines = list(filter(lambda x: not x[:3].isnumeric(), response_lines))
-        content_lines = content_lines[: content_lines.index(".")]
+        response_lines = self.response_text.split(self.LINE_DELIMITER)
+        content_lines = list(filter(self.is_content_line, response_lines))
+        content_lines = content_lines[: content_lines.index(self.CONTENT_DELIMITER)]
         lines_split = (line.split(maxsplit=1) for line in content_lines)
-        return {l[0]: l[1].strip('"') for l in lines_split}
+        return {item: description.strip('"') for item, description in lines_split}
 
 
 class PreliminaryResponse(BaseResponse):
@@ -48,29 +50,20 @@ class PreliminaryResponse(BaseResponse):
     text).
     """
 
-    CONTENT_REGEXP = re.compile(r"^\d{3}\s((?:[\d:a-zA-Z]+\s?)+)$")
-
     def parse_content(self):
-        match = self.CONTENT_REGEXP.search(self.response_text)
-        if not match:
-            raise ValueError(
-                f"Expected response content but received: {self.response_text}"
-            )
-        return {"text": match.group(1)}
+        return {"text": self.response_text.split(maxsplit=1)[1]}
 
 
 class DefineWordResponse(BaseResponse):
-    DEFINITION_DELIMITER = "."
-
     def parse_content(self):
         if self.status_code == DictStatusCode.NO_MATCH:
             return None
         definition_lines = list(
-            filter(self.is_content_line, self.response_text.split("\r\n"))
+            filter(self.is_content_line, self.response_text.split(self.LINE_DELIMITER))
         )
         definitions = []
         while "." in definition_lines:
-            delim_index = definition_lines.index(self.DEFINITION_DELIMITER)
+            delim_index = definition_lines.index(self.CONTENT_DELIMITER)
             new_def = definition_lines[:delim_index]
             definitions.append(
                 {"db": new_def[0].split()[2], "definition": "\n".join(new_def[1:])}
@@ -87,7 +80,7 @@ class MatchResponse(BaseResponse):
         if self.status_code == DictStatusCode.NO_MATCH:
             return None
         match_lines = list(
-            filter(self.is_content_line, self.response_text.split("\r\n"))
+            filter(self.is_content_line, self.response_text.split(self.LINE_DELIMITER))
         )
         match_lines = match_lines[: match_lines.index(".")]
         matches = defaultdict(list)

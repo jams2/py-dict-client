@@ -43,3 +43,19 @@ class DictStatusCode(IntEnum):
     NO_MATCH = 552
     NO_DATABASES = 554
     NO_STRATEGIES = 555
+
+
+PERMANENT_NEGATIVE_COMPLETION_CODES = {
+    DictStatusCode.CMD_NOT_RECOGNIZED,
+    DictStatusCode.ILLEGAL_PARAMS,
+    DictStatusCode.CMD_NOT_IMPLEMENTED,
+    DictStatusCode.PARAM_NOT_IMPLEMENTED,
+    DictStatusCode.ACCESS_DENIED,
+    DictStatusCode.AUTH_FAILED,
+    DictStatusCode.UNKNOWN_MECHANISM,
+    DictStatusCode.INVALID_DB,
+    DictStatusCode.INVALID_STRATEGY,
+    DictStatusCode.NO_MATCH,
+    DictStatusCode.NO_DATABASES,
+    DictStatusCode.NO_STRATEGIES,
+}
