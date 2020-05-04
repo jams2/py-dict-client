@@ -1,3 +1,38 @@
 #+TITLE: py-dict-client
 
 =py-dict-client= is a Python 3 client implementing the [[https://tools.ietf.org/html/rfc2229][Dictionary Server Protocol]].
+
+* Usage Examples
+
+#+begin_src python
+  >>> from dictionary_client import DictionaryClient
+  >>> dc = DictionaryClient()
+
+  >>> dc.databases
+  {'fra-eng': 'French-English FreeDict Dictionary ver. 0.4.1',
+   'eng-fra': 'English-French FreeDict Dictionary ver. 0.1.6',
+   'wn': 'WordNet (r) 3.1 (2011)',
+   'foldoc': 'The Free On-line Dictionary of Computing (2020-04-05)'}
+
+  >>> dc.define('oiseau', db='fra-eng')
+  [{'db': 'fra-eng', 'definition': 'oiseau /wazo/ <n, masc>\nbird'}]
+
+  >>> dc.define('chauffeur')
+  [{'db': 'fra-eng', 'definition': 'chauffeur /ʃofœʀ/ <n, masc>\nchauffeur, driver'},
+   {'db': 'eng-fra', 'definition': 'chauffeur /ʃoufər/\nchauffeur'},
+   {'db': 'wn', 'definition': 'chauffeur\n    n 1: a man paid to drive a privately owned car\n    v 1: drive someone in a vehicle [syn: {drive around},\n         {chauffeur}]'}]
+
+  >>> dc.match('hello')
+  defaultdict(<class 'list'>, {'eng-fra': ['hello'], 'wn': ['hello'], 'foldoc': ['hello']})
+
+  >>> dc.disconnect()
+#+end_src
+
+* TODO implement remaining commands in specification [0/7]
+- [ ] STATUS
+- [ ] SHOW INFO
+- [ ] SHOW SERVER
+- [ ] HELP
+- [ ] OPTION
+- [ ] AUTH
+- [ ] SASLAUTH
