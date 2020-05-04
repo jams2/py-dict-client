@@ -4,7 +4,7 @@ from enum import IntEnum
 class DictStatusCode(IntEnum):
     @staticmethod
     def response_complete(status):
-        return status >= 200 and status < 300
+        return status >= 200
 
     @staticmethod
     def text_follows(status):
