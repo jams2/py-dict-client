@@ -97,7 +97,7 @@ class DatabaseInfoResponse(BaseResponse):
             return None
         db_info_lines = self.get_multipart_content_lines()
         db_info_lines = db_info_lines[: db_info_lines.index(self.CONTENT_DELIMITER)]
-        return '\n'.join(db_info_lines)
+        return "\n".join(db_info_lines)
 
 
 class HandshakeResponse(PreliminaryResponse):
