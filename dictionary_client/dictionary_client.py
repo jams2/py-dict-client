@@ -90,7 +90,7 @@ class DictionaryClient:
     def get_server_status(self):
         self.sock.sendall(status_command())
         response = PreliminaryResponse(self._recv_all())
-        return response.content['text']
+        return response.content["text"]
 
     def define(self, word, db="*"):
         self.sock.sendall(define_word_command(word, db))

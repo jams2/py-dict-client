@@ -1,28 +1,45 @@
-def encode_query(query, encoding="utf-8"):
-    return f"{query}\r\n".encode(encoding)
+from functools import wraps
 
 
+def dictionary_server_command(command_func):
+    @wraps(command_func)
+    def encodes_command(*args, **kwargs):
+        command = command_func(*args, **kwargs)
+        return f"{command}\r\n".encode("utf-8")
+
+    return encodes_command
+
+
+@dictionary_server_command
 def show_strategies_command():
-    return encode_query("SHOW STRAT")
+    return "SHOW STRAT"
 
 
+@dictionary_server_command
 def show_databases_command():
-    return encode_query("SHOW DB")
+    return "SHOW DB"
 
 
+@dictionary_server_command
 def client_ident_command(client_id_info):
-    return encode_query(f"CLIENT {client_id_info}")
+    return f"CLIENT {client_id_info}"
 
 
+@dictionary_server_command
 def disconnect_command():
-    return encode_query("QUIT")
+    return "QUIT"
 
 
+@dictionary_server_command
 def define_word_command(word, db="*"):
-    return encode_query(f"DEFINE {db} {word}")
+    return f"DEFINE {db} {word}"
 
 
+@dictionary_server_command
 def match_command(word, db="*", strategy="exact"):
-    return encode_query(f"MATCH {db} {strategy} {word}")
+    return f"MATCH {db} {strategy} {word}"
+
+
+@dictionary_server_command
 def status_command():
     return "STATUS"

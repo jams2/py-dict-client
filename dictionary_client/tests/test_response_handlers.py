@@ -43,7 +43,11 @@ class TestPreliminaryResponse(unittest.TestCase):
                 150,
                 {"text": "1 definitions found: list follows"},
             ),
-            (b'210 status [d/m/c = 0/0/0; 100.000r 0.000u 0.000s]\r\n', 210, {"text": "status [d/m/c = 0/0/0; 100.000r 0.000u 0.000s]"}),
+            (
+                b"210 status [d/m/c = 0/0/0; 100.000r 0.000u 0.000s]\r\n",
+                210,
+                {"text": "status [d/m/c = 0/0/0; 100.000r 0.000u 0.000s]"},
+            ),
         )
         for response, code, content in fixtures:
             with self.subTest(response=response):
