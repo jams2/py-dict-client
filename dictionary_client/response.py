@@ -51,7 +51,7 @@ class PreliminaryResponse(BaseResponse):
     """
 
     def parse_content(self):
-        return {"text": self.response_text.split(maxsplit=1)[1]}
+        return {"text": self.response_text.split(maxsplit=1)[1].strip()}
 
 
 class DefineWordResponse(BaseResponse):

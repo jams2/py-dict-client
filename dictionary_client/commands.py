@@ -24,3 +24,5 @@ def define_word_command(word, db="*"):
 
 def match_command(word, db="*", strategy="exact"):
     return encode_query(f"MATCH {db} {strategy} {word}")
+def status_command():
+    return "STATUS"

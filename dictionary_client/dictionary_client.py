@@ -10,6 +10,7 @@ from commands import (
     show_strategies_command,
     show_databases_command,
     match_command,
+    status_command,
 )
 from response import (
     HandshakeResponse,
@@ -85,6 +86,11 @@ class DictionaryClient:
         self.sock.sendall(show_databases_command())
         response = ServerPropertiesResponse(self._recv_all())
         return response.content
+
+    def get_server_status(self):
+        self.sock.sendall(status_command())
+        response = PreliminaryResponse(self._recv_all())
+        return response.content['text']
 
     def define(self, word, db="*"):
         self.sock.sendall(define_word_command(word, db))
