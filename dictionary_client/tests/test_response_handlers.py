@@ -36,18 +36,18 @@ class TestHandshakeResponse(unittest.TestCase):
 class TestPreliminaryResponse(unittest.TestCase):
     def test_parse_response(self):
         fixtures = (
-            (b"113 Help text follows\r\n", 113, {"text": "Help text follows"}),
-            (b"250 Command complete\r\n", 250, {"text": "Command complete"}),
-            (b"552 No match\r\n", 552, {"text": "No match"}),
+            (b"113 Help text follows\r\n", 113, "Help text follows"),
+            (b"250 Command complete\r\n", 250, "Command complete"),
+            (b"552 No match\r\n", 552, "No match"),
             (
                 b"150 1 definitions found: list follows\r\n",
                 150,
-                {"text": "1 definitions found: list follows"},
+                "1 definitions found: list follows",
             ),
             (
                 b"210 status [d/m/c = 0/0/0; 100.000r 0.000u 0.000s]\r\n",
                 210,
-                {"text": "status [d/m/c = 0/0/0; 100.000r 0.000u 0.000s]"},
+                "status [d/m/c = 0/0/0; 100.000r 0.000u 0.000s]",
             ),
         )
         for response, code, content in fixtures:
