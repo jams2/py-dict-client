@@ -5,6 +5,11 @@
 `py-dict-client` is a Python 3 client implementing the [Dictionary Server Protocol](https://tools.ietf.org/html/rfc2229).
 
 
+## Installation
+
+`$ pip install py-dict-client`
+
+
 ## Usage
 
     >>> from dictionary_client import DictionaryClient
