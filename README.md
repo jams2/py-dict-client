@@ -1,0 +1,48 @@
+
+# Table of Contents
+
+1.  [Usage Examples](#org9c9f92b)
+2.  [implement remaining commands in specification ](#org722335b)
+
+`py-dict-client` is a Python 3 client implementing the [Dictionary Server Protocol](https://tools.ietf.org/html/rfc2229).
+
+
+<a id="org9c9f92b"></a>
+
+# Usage Examples
+
+    >>> from dictionary_client import DictionaryClient
+    >>> dc = DictionaryClient()
+    
+    >>> dc.databases
+    {'fra-eng': 'French-English FreeDict Dictionary ver. 0.4.1',
+     'eng-fra': 'English-French FreeDict Dictionary ver. 0.1.6',
+     'wn': 'WordNet (r) 3.1 (2011)',
+     'foldoc': 'The Free On-line Dictionary of Computing (2020-04-05)'}
+    
+    >>> dc.define('oiseau', db='fra-eng').content
+    [{'db': 'fra-eng', 'definition': 'oiseau /wazo/ <n, masc>\nbird'}]
+    
+    >>> dc.define('chauffeur').content
+    [{'db': 'fra-eng', 'definition': 'chauffeur /ʃofœʀ/ <n, masc>\nchauffeur, driver'},
+     {'db': 'eng-fra', 'definition': 'chauffeur /ʃoufər/\nchauffeur'},
+     {'db': 'wn', 'definition': 'chauffeur\n    n 1: a man paid to drive a privately owned car\n...'}]
+    
+    >>> dc.match('hello').content
+    defaultdict(<class 'list'>, {'eng-fra': ['hello'], 'wn': ['hello'], 'foldoc': ['hello']})
+    
+    >>> dc.disconnect()
+
+
+<a id="org722335b"></a>
+
+# implement remaining commands in specification 
+
+-   [X] STATUS
+-   [X] SHOW INFO
+-   [ ] SHOW SERVER
+-   [ ] HELP
+-   [ ] OPTION
+-   [ ] AUTH
+-   [ ] SASLAUTH
+

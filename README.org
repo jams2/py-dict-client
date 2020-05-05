@@ -14,23 +14,23 @@
    'wn': 'WordNet (r) 3.1 (2011)',
    'foldoc': 'The Free On-line Dictionary of Computing (2020-04-05)'}
 
-  >>> dc.define('oiseau', db='fra-eng')
+  >>> dc.define('oiseau', db='fra-eng').content
   [{'db': 'fra-eng', 'definition': 'oiseau /wazo/ <n, masc>\nbird'}]
 
-  >>> dc.define('chauffeur')
+  >>> dc.define('chauffeur').content
   [{'db': 'fra-eng', 'definition': 'chauffeur /ʃofœʀ/ <n, masc>\nchauffeur, driver'},
    {'db': 'eng-fra', 'definition': 'chauffeur /ʃoufər/\nchauffeur'},
-   {'db': 'wn', 'definition': 'chauffeur\n    n 1: a man paid to drive a privately owned car\n    v 1: drive someone in a vehicle [syn: {drive around},\n         {chauffeur}]'}]
+   {'db': 'wn', 'definition': 'chauffeur\n    n 1: a man paid to drive a privately owned car\n...'}]
 
-  >>> dc.match('hello')
+  >>> dc.match('hello').content
   defaultdict(<class 'list'>, {'eng-fra': ['hello'], 'wn': ['hello'], 'foldoc': ['hello']})
 
   >>> dc.disconnect()
 #+end_src
 
-* TODO implement remaining commands in specification [0/7]
-- [ ] STATUS
-- [ ] SHOW INFO
+* TODO implement remaining commands in specification [2/7]
+- [X] STATUS
+- [X] SHOW INFO
 - [ ] SHOW SERVER
 - [ ] HELP
 - [ ] OPTION
