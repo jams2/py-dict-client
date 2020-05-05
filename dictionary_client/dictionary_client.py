@@ -124,11 +124,3 @@ class DictionaryClient:
                 f'"{bytes_recieved.decode()}"'
             )
         self.sock.close()
-
-
-class DictionaryClientException(Exception):
-    pass
-
-
-class NotSupported(DictionaryClientException):
-    pass
