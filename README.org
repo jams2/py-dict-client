@@ -1,8 +1,12 @@
 #+TITLE: py-dict-client
+#+OPTIONS: todo:t
+#+OPTIONS: toc:nil
+#+OPTIONS: date:t
 
+* py-dict-client
 =py-dict-client= is a Python 3 client implementing the [[https://tools.ietf.org/html/rfc2229][Dictionary Server Protocol]].
 
-* Usage Examples
+** Usage Examples
 
 #+begin_src python
   >>> from dictionary_client import DictionaryClient
@@ -28,11 +32,10 @@
   >>> dc.disconnect()
 #+end_src
 
-* To do:
-** TODO implement remaining commands in specification [2/7]
+** TODO implement remaining commands in specification [3/7]
 - [X] STATUS
 - [X] SHOW INFO
-- [ ] SHOW SERVER
+- [X] SHOW SERVER
 - [ ] HELP
 - [ ] OPTION
 - [ ] AUTH

@@ -12,6 +12,7 @@ from commands import (
     match_command,
     status_command,
     show_info_command,
+    show_server_command,
 )
 from response import (
     HandshakeResponse,
@@ -20,6 +21,7 @@ from response import (
     ServerPropertiesResponse,
     MatchResponse,
     DatabaseInfoResponse,
+    MultiLineResponse,
 )
 from status_codes import DictStatusCode
 
@@ -95,6 +97,9 @@ class DictionaryClient:
 
     def get_server_status(self):
         return self._get_response(status_command(), PreliminaryResponse)
+
+    def get_server_information(self):
+        return self._get_response(show_server_command(), MultiLineResponse)
 
     def get_db_info(self, db):
         if db not in self.databases:

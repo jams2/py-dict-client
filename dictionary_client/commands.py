@@ -48,3 +48,8 @@ def status_command():
 @dictionary_server_command
 def show_info_command(db):
     return f"SHOW INFO {db}"
+
+
+@dictionary_server_command
+def show_server_command():
+    return "SHOW SERVER"

@@ -7,6 +7,7 @@ from response import (
     DefineWordResponse,
     MatchResponse,
     DatabaseInfoResponse,
+    MultiLineResponse,
 )
 
 
@@ -192,6 +193,34 @@ class TestDefineWordResponse(unittest.TestCase):
             ],
             response.content,
         )
+
+
+class TestMultiLineResponse(unittest.TestCase):
+    def test_parses_content(self):
+        """ The output format is not in the specification, so we will
+        just return a string.
+        """
+        dict_response = (
+            b"114 server information\r\ndictd 1.12.1/rf on Linux 5.6.8-arch1-1\r\n"
+            b"On yonaguni.localdomain: up 1+02:11:17, 12 forks (0.5/hour)\r\n\r\n"
+            b"Database      Headwords         Index          Data  Uncompressed\r\n"
+            b"fra-eng       8511        131 kB        140 kB        381 kB\r\n"
+            b"eng-fra       8805        128 kB        132 kB        334 kB\r\n"
+            b"wn          147483       3005 kB       9272 kB         29 MB\r\n"
+            b"foldoc       15197        299 kB       2249 kB       5522 kB\r\n"
+            b"\r\n.\r\n250 ok\r\n"
+        )
+        response = MultiLineResponse(dict_response)
+        expected = (
+            "dictd 1.12.1/rf on Linux 5.6.8-arch1-1\n"
+            "On yonaguni.localdomain: up 1+02:11:17, 12 forks (0.5/hour)\n\n"
+            "Database      Headwords         Index          Data  Uncompressed\n"
+            "fra-eng       8511        131 kB        140 kB        381 kB\n"
+            "eng-fra       8805        128 kB        132 kB        334 kB\n"
+            "wn          147483       3005 kB       9272 kB         29 MB\n"
+            "foldoc       15197        299 kB       2249 kB       5522 kB\n"
+        )
+        self.assertEqual(expected, response.content)
 
 
 class TestDatabaseInfoResponse(unittest.TestCase):

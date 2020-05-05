@@ -91,13 +91,18 @@ class MatchResponse(BaseResponse):
         return matches
 
 
-class DatabaseInfoResponse(BaseResponse):
+class MultiLineResponse(BaseResponse):
+    def parse_content(self):
+        content_lines = self.get_multipart_content_lines()
+        content_lines = content_lines[: content_lines.index(self.CONTENT_DELIMITER)]
+        return "\n".join(content_lines)
+
+
+class DatabaseInfoResponse(MultiLineResponse):
     def parse_content(self):
         if self.status_code == DictStatusCode.INVALID_DB:
             return None
-        db_info_lines = self.get_multipart_content_lines()
-        db_info_lines = db_info_lines[: db_info_lines.index(self.CONTENT_DELIMITER)]
-        return "\n".join(db_info_lines)
+        return super().parse_content()
 
 
 class HandshakeResponse(PreliminaryResponse):
