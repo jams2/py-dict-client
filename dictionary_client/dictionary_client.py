@@ -13,6 +13,7 @@ from commands import (
     status_command,
     show_info_command,
     show_server_command,
+    help_command,
 )
 from response import (
     HandshakeResponse,
@@ -105,6 +106,9 @@ class DictionaryClient:
         if db not in self.databases:
             raise ValueError(f'Invalid database name: "{db}" not present.')
         return self._get_response(show_info_command(db), DatabaseInfoResponse)
+
+    def get_help_text(self):
+        return self._get_response(help_command(), MultiLineResponse)
 
     def define(self, word, db="*"):
         if db != "*" and db not in self.databases:

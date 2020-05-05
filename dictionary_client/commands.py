@@ -53,3 +53,8 @@ def show_info_command(db):
 @dictionary_server_command
 def show_server_command():
     return "SHOW SERVER"
+
+
+@dictionary_server_command
+def help_command():
+    return "HELP"

@@ -5,7 +5,7 @@
 `py-dict-client` is a Python 3 client implementing the [Dictionary Server Protocol](https://tools.ietf.org/html/rfc2229).
 
 
-## Usage Examples
+## Usage
 
     >>> from dictionary_client import DictionaryClient
     >>> dc = DictionaryClient()
@@ -35,7 +35,7 @@
 -   [X] STATUS
 -   [X] SHOW INFO
 -   [X] SHOW SERVER
--   [ ] HELP
+-   [X] HELP
 -   [ ] OPTION
 -   [ ] AUTH
 -   [ ] SASLAUTH

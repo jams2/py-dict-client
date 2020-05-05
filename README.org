@@ -6,7 +6,7 @@
 * py-dict-client
 =py-dict-client= is a Python 3 client implementing the [[https://tools.ietf.org/html/rfc2229][Dictionary Server Protocol]].
 
-** Usage Examples
+** Usage
 
 #+begin_src python
   >>> from dictionary_client import DictionaryClient
@@ -32,11 +32,11 @@
   >>> dc.disconnect()
 #+end_src
 
-** TODO implement remaining commands in specification [3/7]
+** TODO implement remaining commands in specification [4/7]
 - [X] STATUS
 - [X] SHOW INFO
 - [X] SHOW SERVER
-- [ ] HELP
+- [X] HELP
 - [ ] OPTION
 - [ ] AUTH
 - [ ] SASLAUTH
