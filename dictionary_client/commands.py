@@ -43,3 +43,8 @@ def match_command(word, db="*", strategy="exact"):
 @dictionary_server_command
 def status_command():
     return "STATUS"
+
+
+@dictionary_server_command
+def show_info_command(db):
+    return f"SHOW INFO {db}"

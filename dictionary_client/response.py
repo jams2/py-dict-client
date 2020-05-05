@@ -27,6 +27,11 @@ class BaseResponse(metaclass=ABCMeta):
     def parse_content(self):
         pass
 
+    def get_multipart_content_lines(self):
+        return list(
+            filter(self.is_content_line, self.response_text.split(self.LINE_DELIMITER))
+        )
+
     def is_content_line(self, line):
         return self.STATUS_REGEXP.match(line) is None
 
@@ -58,9 +63,7 @@ class DefineWordResponse(BaseResponse):
     def parse_content(self):
         if self.status_code == DictStatusCode.NO_MATCH:
             return None
-        definition_lines = list(
-            filter(self.is_content_line, self.response_text.split(self.LINE_DELIMITER))
-        )
+        definition_lines = self.get_multipart_content_lines()
         definitions = []
         while "." in definition_lines:
             delim_index = definition_lines.index(self.CONTENT_DELIMITER)
@@ -79,15 +82,22 @@ class MatchResponse(BaseResponse):
     def parse_content(self):
         if self.status_code == DictStatusCode.NO_MATCH:
             return None
-        match_lines = list(
-            filter(self.is_content_line, self.response_text.split(self.LINE_DELIMITER))
-        )
-        match_lines = match_lines[: match_lines.index(".")]
+        match_lines = self.get_multipart_content_lines()
+        match_lines = match_lines[: match_lines.index(self.CONTENT_DELIMITER)]
         matches = defaultdict(list)
         for line in match_lines:
             db_name, match = line.split(maxsplit=1)
             matches[db_name].append(match.strip('"'))
         return matches
+
+
+class DatabaseInfoResponse(BaseResponse):
+    def parse_content(self):
+        if self.status_code == DictStatusCode.INVALID_DB:
+            return None
+        db_info_lines = self.get_multipart_content_lines()
+        db_info_lines = db_info_lines[: db_info_lines.index(self.CONTENT_DELIMITER)]
+        return '\n'.join(db_info_lines)
 
 
 class HandshakeResponse(PreliminaryResponse):

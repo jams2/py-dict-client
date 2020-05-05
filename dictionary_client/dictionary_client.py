@@ -1,6 +1,6 @@
+import getpass
 import select
 import socket
-import getpass
 from datetime import datetime
 
 from commands import (
@@ -11,6 +11,7 @@ from commands import (
     show_databases_command,
     match_command,
     status_command,
+    show_info_command,
 )
 from response import (
     HandshakeResponse,
@@ -18,6 +19,7 @@ from response import (
     PreliminaryResponse,
     ServerPropertiesResponse,
     MatchResponse,
+    DatabaseInfoResponse,
 )
 from status_codes import DictStatusCode
 
@@ -91,6 +93,13 @@ class DictionaryClient:
         self.sock.sendall(status_command())
         response = PreliminaryResponse(self._recv_all())
         return response.content["text"]
+
+    def get_db_info(self, db):
+        if db not in self.databases:
+            raise ValueError(f'Invalid database name: "{db}" not present.')
+        self.sock.sendall(show_info_command(db))
+        response = DatabaseInfoResponse(self._recv_all())
+        return response
 
     def define(self, word, db="*"):
         self.sock.sendall(define_word_command(word, db))

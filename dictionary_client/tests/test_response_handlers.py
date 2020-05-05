@@ -6,6 +6,7 @@ from response import (
     HandshakeResponse,
     DefineWordResponse,
     MatchResponse,
+    DatabaseInfoResponse,
 )
 
 
@@ -191,6 +192,28 @@ class TestDefineWordResponse(unittest.TestCase):
             ],
             response.content,
         )
+
+
+class TestDatabaseInfoResponse(unittest.TestCase):
+    def test_invalid_db_returns_none(self):
+        response = DatabaseInfoResponse(
+            b'550 Invalid database, use "SHOW DB" for list of databases'
+        )
+        self.assertIsNone(response.content)
+
+    def test_valid_response_parsed(self):
+        dict_response = (
+            b"112 information for eng-fra\r\n============ eng-fra ============"
+            b"\r\nEnglish-French FreeDict Dictionary\r\n\r\nMaintainer: "
+            b"[up for grabs]\r\n.\r\n250 ok\r\n"
+        )
+        response = DatabaseInfoResponse(dict_response)
+        expected = (
+            "============ eng-fra ============"
+            "\nEnglish-French FreeDict Dictionary\n\nMaintainer: "
+            "[up for grabs]"
+        )
+        self.assertEqual(expected, response.content)
 
 
 class TestMatchResponse(unittest.TestCase):
