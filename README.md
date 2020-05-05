@@ -1,13 +1,14 @@
 
 # Table of Contents
 
-1.  [Usage Examples](#org9c9f92b)
-2.  [implement remaining commands in specification ](#org722335b)
+1.  [Usage Examples](#org7a8f314)
+2.  [To do:](#orgf375cd9)
+    1.  [implement remaining commands in specification ](#orgc9c45ae)
 
 `py-dict-client` is a Python 3 client implementing the [Dictionary Server Protocol](https://tools.ietf.org/html/rfc2229).
 
 
-<a id="org9c9f92b"></a>
+<a id="org7a8f314"></a>
 
 # Usage Examples
 
@@ -34,9 +35,14 @@
     >>> dc.disconnect()
 
 
-<a id="org722335b"></a>
+<a id="orgf375cd9"></a>
 
-# implement remaining commands in specification 
+# To do:
+
+
+<a id="orgc9c45ae"></a>
+
+## implement remaining commands in specification 
 
 -   [X] STATUS
 -   [X] SHOW INFO

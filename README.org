@@ -28,7 +28,8 @@
   >>> dc.disconnect()
 #+end_src
 
-* TODO implement remaining commands in specification [2/7]
+* To do:
+** TODO implement remaining commands in specification [2/7]
 - [X] STATUS
 - [X] SHOW INFO
 - [ ] SHOW SERVER
