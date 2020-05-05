@@ -89,27 +89,31 @@ class DictionaryClient:
         response = ServerPropertiesResponse(self._recv_all())
         return response.content
 
+    def _get_response(self, command, response_class):
+        self.sock.sendall(command)
+        return response_class(self._recv_all())
+
     def get_server_status(self):
-        self.sock.sendall(status_command())
-        response = PreliminaryResponse(self._recv_all())
-        return response.content["text"]
+        return self._get_response(status_command(), PreliminaryResponse)
 
     def get_db_info(self, db):
         if db not in self.databases:
             raise ValueError(f'Invalid database name: "{db}" not present.')
-        self.sock.sendall(show_info_command(db))
-        response = DatabaseInfoResponse(self._recv_all())
-        return response
+        return self._get_response(show_info_command(db), DatabaseInfoResponse)
 
     def define(self, word, db="*"):
-        self.sock.sendall(define_word_command(word, db))
-        response = DefineWordResponse(self._recv_all())
-        return response.content
+        if db != "*" and db not in self.databases:
+            raise ValueError(f'Invalid database name: "{db}" not present.')
+        return self._get_response(define_word_command(word, db), DefineWordResponse)
 
     def match(self, word, db="*", strategy="exact"):
-        self.sock.sendall(match_command(word, db=db, strategy=strategy))
-        response = MatchResponse(self._recv_all())
-        return response.content
+        if db != "*" and db not in self.databases:
+            raise ValueError(f'Invalid database name: "{db}" not present.')
+        elif strategy not in self.strategies:
+            raise ValueError(f'Unknown strategy: "{db}".')
+        return self._get_response(
+            match_command(word, db=db, strategy=strategy), MatchResponse
+        )
 
     def disconnect(self):
         self.sock.sendall(disconnect_command())
