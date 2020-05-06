@@ -3,7 +3,7 @@ import select
 import socket
 from datetime import datetime
 
-from commands import (
+from .commands import (
     client_ident_command,
     define_word_command,
     disconnect_command,
@@ -15,7 +15,7 @@ from commands import (
     show_server_command,
     help_command,
 )
-from response import (
+from .response import (
     HandshakeResponse,
     DefineWordResponse,
     PreliminaryResponse,
@@ -24,7 +24,7 @@ from response import (
     DatabaseInfoResponse,
     MultiLineResponse,
 )
-from status_codes import DictStatusCode
+from .status_codes import DictStatusCode
 
 
 BUF_SIZE = 4096

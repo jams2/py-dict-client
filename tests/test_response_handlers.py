@@ -1,6 +1,6 @@
 import unittest
 
-from response import (
+from dictionary_client.response import (
     PreliminaryResponse,
     ServerPropertiesResponse,
     HandshakeResponse,

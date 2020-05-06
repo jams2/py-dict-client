@@ -8,7 +8,7 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="py-dict-client",
-    version="0.1.0",
+    version="0.1.2",
     description="A client implementing the Dictionary Server Protocol (DICT)",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -22,7 +22,7 @@ setup(
         "Programming Language :: Python :: 3",
     ],
     keywords="dictionary language definition server client",
-    package_dir={"": "dictionary_client"},
-    packages=find_packages(where="dictionary_client"),
+    package_dir={"dictionary_client": "dictionary_client"},
+    packages=["dictionary_client"],
     python_requires=">=3",
 )

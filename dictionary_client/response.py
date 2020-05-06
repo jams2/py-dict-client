@@ -2,7 +2,7 @@ import re
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
-from status_codes import DictStatusCode, PERMANENT_NEGATIVE_COMPLETION_CODES
+from .status_codes import DictStatusCode, PERMANENT_NEGATIVE_COMPLETION_CODES
 
 
 class BaseResponse(metaclass=ABCMeta):
