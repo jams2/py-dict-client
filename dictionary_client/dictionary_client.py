@@ -80,7 +80,7 @@ class DictionaryClient:
         return int(response_bytes[:3])
 
     def _response_complete(self, response_bytes):
-        return b"250" in response_bytes
+        return b"250" in response_bytes and response_bytes[-2:] == b"\r\n"
 
     def _get_strategies(self):
         self.sock.sendall(show_strategies_command())
