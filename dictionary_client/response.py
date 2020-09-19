@@ -108,16 +108,24 @@ class DatabaseInfoResponse(MultiLineResponse):
 class HandshakeResponse(PreliminaryResponse):
     CAPABILITIES_RE = re.compile(r"<([\w\d_]*(\.[\w\d_]+)*)>")
     MSG_ID_RE = re.compile(r"(<[\d\w@.]+>)\r\n")
+    BANNER_RE = re.compile(r"^220 ([^<]+)?")
 
     def parse_content(self):
         capabilities_match = self.CAPABILITIES_RE.search(self.response_text)
         msg_id_match = self.MSG_ID_RE.search(self.response_text)
+        banner_match = self.BANNER_RE.search(self.response_text)
         if not msg_id_match:
             raise ValueError(
                 "Client got unexpected banner in connection response: "
                 f"{self.response_text}"
             )
-        content = {"message_id": msg_id_match.group(1), "capabilities": None}
+        content = {
+            "message_id": msg_id_match.group(1),
+            "capabilities": None,
+            "banner": None,
+        }
         if capabilities_match:
             content.update({"capabilities": capabilities_match.group(1).split(".")})
+        if banner_match:
+            content.update({"banner": banner_match.group(1).rstrip()})
         return content
