@@ -1,3 +1,0 @@
-#!/bin/sh
-
-nose2 -s tests/ -C --coverage-config .coveragerc && coverage html
