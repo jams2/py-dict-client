@@ -35,6 +35,13 @@
     >>> dc.disconnect()
 
 
+## Contributing
+
+Contributions are welcome. Please format your code with black, and add/improve tests where suitable.
+
+To run the tests: `$ make test`
+
+
 ## TODO implement remaining commands in specification 
 
 -   [X] STATUS

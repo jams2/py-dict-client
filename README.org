@@ -36,6 +36,12 @@
   >>> dc.disconnect()
 #+end_src
 
+** Contributing
+Contributions are welcome. Please format your code with black, and add/improve tests where suitable.
+
+To run the tests: =$ make test=
+
+
 ** TODO implement remaining commands in specification [4/7]
 - [X] STATUS
 - [X] SHOW INFO
