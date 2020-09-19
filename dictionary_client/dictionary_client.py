@@ -115,11 +115,11 @@ class DictionaryClient:
             raise ValueError(f'Invalid database name: "{db}" not present.')
         return self._get_response(define_word_command(word, db), DefineWordResponse)
 
-    def match(self, word, db="*", strategy="exact"):
+    def match(self, word, db="*", strategy="."):
         if db != "*" and db not in self.databases:
             raise ValueError(f'Invalid database name: "{db}" not present.')
-        elif strategy not in self.strategies:
-            raise ValueError(f'Unknown strategy: "{db}".')
+        if strategy != "." and strategy not in self.strategies:
+            raise ValueError(f'Unknown strategy: "{strategy}".')
         return self._get_response(
             match_command(word, db=db, strategy=strategy), MatchResponse
         )
