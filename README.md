@@ -1,6 +1,6 @@
 
 
-# py-dict-client 0.1.3
+# py-dict-client 0.1.4
 
 `py-dict-client` is a Python 3 client implementing the [Dictionary Server Protocol](https://tools.ietf.org/html/rfc2229).
 
