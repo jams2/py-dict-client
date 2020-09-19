@@ -25,4 +25,8 @@ setup(
     package_dir={"dictionary_client": "dictionary_client"},
     packages=["dictionary_client"],
     python_requires=">=3",
+    extras_require={
+        "dev": ["nose2", "coverage", "pylint", "flake8", "black"],
+        "dist": ["setuptools", "wheel", "twine"],
+    },
 )
