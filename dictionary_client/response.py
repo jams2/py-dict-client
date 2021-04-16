@@ -105,8 +105,22 @@ class DatabaseInfoResponse(MultiLineResponse):
 
 
 class HandshakeResponse(PreliminaryResponse):
-    CAPABILITIES_RE = re.compile(r"<([\w\d_]*(\.[\w\d_]+)*)>")
-    MSG_ID_RE = re.compile(r"(<[\d\w@.]+>)\r\n")
+    MSG_ATOM = r"[^\s<>.\\]"
+    CAPABILITIES_RE = re.compile(
+        fr"< ( {MSG_ATOM}* (\.{MSG_ATOM}+)* ) >",
+        re.VERBOSE,
+    )
+    MSG_ID_RE = re.compile(
+        fr"""
+        (<
+        {MSG_ATOM}* (?:\.{MSG_ATOM}*)*
+        @
+        {MSG_ATOM}* (?:\.{MSG_ATOM}*)*
+        >)
+        \r\n
+        """,
+        re.VERBOSE,
+    )
     BANNER_RE = re.compile(r"^220 ([^<]+)?")
 
     def parse_content(self):

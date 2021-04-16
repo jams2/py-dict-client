@@ -30,7 +30,20 @@ class TestHandshakeResponse(unittest.TestCase):
             response.content["message_id"],
         )
         self.assertEqual(
-            ["auth", "mime"], response.content["capabilities"],
+            ["auth", "mime"],
+            response.content["capabilities"],
+        )
+
+    def test_parse_response_with_dash(self):
+        """https://github.com/jams2/py-dict-client/issues/5"""
+        dict_response = (
+            b"220 home.eking-go.org dictd 1.12.1/rf on Linux 5.10.0-0.bpo.4-amd64 "
+            b"<auth.mime> <3.10523.1618577900@home.eking-go.org>\r\n"
+        )
+        response = HandshakeResponse(dict_response)
+        self.assertEqual(
+            "<3.10523.1618577900@home.eking-go.org>",
+            response.content["message_id"],
         )
 
 

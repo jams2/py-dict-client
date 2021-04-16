@@ -3,7 +3,7 @@
 #+OPTIONS: toc:nil
 #+OPTIONS: date:t
 
-* py-dict-client 0.1.4
+* py-dict-client 0.1.5
 =py-dict-client= is a Python 3 client implementing the [[https://tools.ietf.org/html/rfc2229][Dictionary Server Protocol]].
 
 ** Installation
