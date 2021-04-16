@@ -1,4 +1,7 @@
-test:
+dev:
+	pip install -e .[dev]
+
+test: dev
 	nose2 -s tests/ -C --coverage-config .coveragerc && coverage html
 
 dist: test
