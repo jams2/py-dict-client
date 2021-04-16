@@ -1,13 +1,13 @@
 import unittest
 
 from dictionary_client.response import (
+    DatabaseInfoResponse,
+    DefineWordResponse,
+    HandshakeResponse,
+    MatchResponse,
+    MultiLineResponse,
     PreliminaryResponse,
     ServerPropertiesResponse,
-    HandshakeResponse,
-    DefineWordResponse,
-    MatchResponse,
-    DatabaseInfoResponse,
-    MultiLineResponse,
 )
 
 
@@ -197,7 +197,7 @@ class TestDefineWordResponse(unittest.TestCase):
 
 class TestMultiLineResponse(unittest.TestCase):
     def test_parses_content(self):
-        """ The output format is not in the specification, so we will
+        """The output format is not in the specification, so we will
         just return a string.
         """
         dict_response = (
@@ -277,7 +277,7 @@ class TestMatchResponse(unittest.TestCase):
         self.assertEqual(152, response.status_code)
 
     def test_parse_content_with_quote_marks(self):
-        """ The spec shows no quote marks around matches, but on this
+        """The spec shows no quote marks around matches, but on this
         user's machine (dictd on Arch Linux) the following is returned.
         Handle both cases.
         """

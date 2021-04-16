@@ -7,25 +7,24 @@ from .commands import (
     client_ident_command,
     define_word_command,
     disconnect_command,
-    show_strategies_command,
-    show_databases_command,
+    help_command,
     match_command,
-    status_command,
+    show_databases_command,
     show_info_command,
     show_server_command,
-    help_command,
+    show_strategies_command,
+    status_command,
 )
 from .response import (
-    HandshakeResponse,
+    DatabaseInfoResponse,
     DefineWordResponse,
+    HandshakeResponse,
+    MatchResponse,
+    MultiLineResponse,
     PreliminaryResponse,
     ServerPropertiesResponse,
-    MatchResponse,
-    DatabaseInfoResponse,
-    MultiLineResponse,
 )
 from .status_codes import DictStatusCode
-
 
 BUF_SIZE = 4096
 DEFAULT_PORT = 2628

@@ -2,7 +2,7 @@ import re
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
-from .status_codes import DictStatusCode, PERMANENT_NEGATIVE_COMPLETION_CODES
+from .status_codes import PERMANENT_NEGATIVE_COMPLETION_CODES, DictStatusCode
 
 
 class BaseResponse(metaclass=ABCMeta):
@@ -37,8 +37,7 @@ class BaseResponse(metaclass=ABCMeta):
 
 
 class ServerPropertiesResponse(BaseResponse):
-    """ Responses to a SHOW DB or SHOW STRAT command
-    """
+    """Responses to a SHOW DB or SHOW STRAT command"""
 
     def parse_content(self):
         if self.status_code in PERMANENT_NEGATIVE_COMPLETION_CODES:
@@ -51,7 +50,7 @@ class ServerPropertiesResponse(BaseResponse):
 
 
 class PreliminaryResponse(BaseResponse):
-    """ A generic one line response (status code followed by optional
+    """A generic one line response (status code followed by optional
     text).
     """
 
