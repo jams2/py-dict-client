@@ -79,7 +79,7 @@ class DefineWordResponse(BaseResponse):
 
 class MatchResponse(BaseResponse):
     def parse_content(self):
-        if self.status_code == DictStatusCode.NO_MATCH:
+        if self.status_code in [DictStatusCode.NO_MATCH, DictStatusCode.ILLEGAL_PARAMS]:
             return None
         match_lines = self.get_multipart_content_lines()
         match_lines = match_lines[: match_lines.index(self.CONTENT_DELIMITER)]
