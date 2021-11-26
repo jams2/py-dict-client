@@ -30,18 +30,54 @@ BUF_SIZE = 4096
 DEFAULT_PORT = 2628
 
 
+class ReadOnlyDescriptor:
+    def __set_name__(self, owner, name):
+        self.public_name = name
+        self.private_name = f"_{name}"
+
+    def raise_read_only(self, obj):
+        raise AttributeError(
+            f"{obj.__class__.__name__}.{self.public_name} is a read-only attribute"
+        )
+
+    def __set__(self, obj, value):
+        self.raise_read_only(obj)
+
+    def __delete__(self, obj):
+        self.raise_read_only(obj)
+
+
+class Strategies(ReadOnlyDescriptor):
+    def __get__(self, obj, obj_type=None):
+        if not getattr(obj, self.private_name, None):
+            obj.sock.sendall(show_strategies_command())
+            response = ServerPropertiesResponse(obj._recv_all())
+            setattr(obj, self.private_name, response.content)
+        return getattr(obj, self.private_name)
+
+
+class Databases(ReadOnlyDescriptor):
+    def __get__(self, obj, obj_type=None):
+        if not getattr(obj, self.private_name, None):
+            obj.sock.sendall(show_databases_command())
+            response = ServerPropertiesResponse(obj._recv_all())
+            setattr(obj, self.private_name, response.content)
+        return getattr(obj, self.private_name)
+
+
 class DictionaryClient:
     """Implements a client for communication with a server implementing
     the DICT Server Protocol (https://tools.ietf.org/html/rfc2229).
     """
+
+    strategies = Strategies()
+    databases = Databases()
 
     def __init__(self, host="localhost", port=DEFAULT_PORT, sock_class=socket.socket):
         self.client_name = f"{getpass.getuser()}@{socket.gethostname()}"
         self.client_id_info = f"{self.client_name} {datetime.now().isoformat()}"
         self.sock = sock_class(socket.AF_INET, socket.SOCK_STREAM)
         self.server_info = self._connect(host, port)
-        self.strategies = self._get_strategies()
-        self.databases = self._get_databases()
 
     def _recv_all(self):
         rlist, _, _ = select.select([self.sock], [], [], 5)
@@ -80,16 +116,6 @@ class DictionaryClient:
 
     def _response_complete(self, response_bytes):
         return b"250" in response_bytes and response_bytes[-2:] == b"\r\n"
-
-    def _get_strategies(self):
-        self.sock.sendall(show_strategies_command())
-        response = ServerPropertiesResponse(self._recv_all())
-        return response.content
-
-    def _get_databases(self):
-        self.sock.sendall(show_databases_command())
-        response = ServerPropertiesResponse(self._recv_all())
-        return response.content
 
     def _get_response(self, command, response_class):
         self.sock.sendall(command)
