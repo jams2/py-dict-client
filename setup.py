@@ -9,7 +9,7 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="py-dict-client",
-    version="0.1.5",
+    version="0.1.6",
     description="A client implementing the Dictionary Server Protocol (DICT)",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -27,7 +27,7 @@ setup(
     packages=["dictionary_client"],
     python_requires=">=3",
     extras_require={
-        "dev": ["nose2", "coverage", "pylint", "flake8", "black"],
+        "dev": ["nose2", "coverage", "pylint", "flake8", "black", "isort"],
         "dist": ["setuptools", "wheel", "twine"],
     },
 )
