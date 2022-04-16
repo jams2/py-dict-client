@@ -25,6 +25,7 @@ from .response import (
     ServerPropertiesResponse,
 )
 from .status_codes import DictStatusCode
+from .word import Word
 
 BUF_SIZE = 4096
 DEFAULT_PORT = 2628
@@ -135,16 +136,18 @@ class DictionaryClient:
     def get_help_text(self):
         return self._get_response(help_command(), MultiLineResponse)
 
-    def define(self, word, db="*"):
+    def define(self, word_raw, db="*"):
         if db != "*" and db not in self.databases:
             raise ValueError(f'Invalid database name: "{db}" not present.')
+        word = Word(word_raw)
         return self._get_response(define_word_command(word, db), DefineWordResponse)
 
-    def match(self, word, db="*", strategy="."):
+    def match(self, word_raw, db="*", strategy="."):
         if db != "*" and db not in self.databases:
             raise ValueError(f'Invalid database name: "{db}" not present.')
         if strategy != "." and strategy not in self.strategies:
             raise ValueError(f'Unknown strategy: "{strategy}".')
+        word = Word(word_raw)
         return self._get_response(
             match_command(word, db=db, strategy=strategy), MatchResponse
         )
