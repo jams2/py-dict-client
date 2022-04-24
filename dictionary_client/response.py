@@ -82,7 +82,10 @@ class MatchResponse(BaseResponse):
         if self.status_code == DictStatusCode.NO_MATCH:
             return None
         match_lines = self.get_multipart_content_lines()
-        match_lines = match_lines[: match_lines.index(self.CONTENT_DELIMITER)]
+        try:
+            match_lines = match_lines[: match_lines.index(self.CONTENT_DELIMITER)]
+        except ValueError:
+            return None
         matches = defaultdict(list)
         for line in match_lines:
             db_name, match = line.split(maxsplit=1)
@@ -106,10 +109,7 @@ class DatabaseInfoResponse(MultiLineResponse):
 
 class HandshakeResponse(PreliminaryResponse):
     MSG_ATOM = r"[^\s<>.\\]"
-    CAPABILITIES_RE = re.compile(
-        fr"< ( {MSG_ATOM}* (\.{MSG_ATOM}+)* ) >",
-        re.VERBOSE,
-    )
+    CAPABILITIES_RE = re.compile(fr"< ( {MSG_ATOM}* (\.{MSG_ATOM}+)* ) >", re.VERBOSE,)
     MSG_ID_RE = re.compile(
         fr"""
         (<
