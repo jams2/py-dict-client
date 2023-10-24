@@ -116,7 +116,7 @@ class DictionaryClient:
         return int(response_bytes[:3])
 
     def _response_complete(self, response_bytes):
-        return b"250" in response_bytes and response_bytes[-2:] == b"\r\n"
+        return (response_bytes.startswith(b"250") or b"\r\n250" in response_bytes) and response_bytes[-2:] == b"\r\n"
 
     def _get_response(self, command, response_class):
         self.sock.sendall(command)
